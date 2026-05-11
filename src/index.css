@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f5f6f8;
+  color: #111827;
+  font-family: 'Noto Sans KR', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
+}
+
+.status-clear {
+  @apply bg-emerald-50 text-emerald-700 border border-emerald-200;
+}
+.status-drop {
+  @apply bg-red-50 text-red-700 border border-red-200;
+}
+.status-ongoing {
+  @apply bg-blue-50 text-blue-700 border border-blue-200;
+}
+.status-hold {
+  @apply bg-amber-50 text-amber-700 border border-amber-200;
+}
+
+.pm-card {
+  @apply bg-white border border-[#e5e7eb] rounded-xl shadow-sm;
+}
+
+.pm-input {
+  @apply bg-white border border-[#e5e7eb] rounded-lg px-3 py-2 text-[#111827]
+         placeholder-[#9ca3af] focus:outline-none focus:border-blue-500
+         focus:ring-1 focus:ring-blue-500/30 transition-all w-full text-sm;
+}
+
+.pm-btn-primary {
+  @apply bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg
+         text-sm font-medium transition-all active:scale-95;
+}
+
+.pm-btn-ghost {
+  @apply bg-transparent hover:bg-[#f3f4f6] text-[#6b7280] hover:text-[#111827]
+         px-3 py-2 rounded-lg text-sm transition-all;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: rgba(239,68,68,0.4); }
+  50% { border-color: rgba(239,68,68,0.9); }
+}
+.urgent-pulse {
+  animation: pulse-border 2s ease-in-out infinite;
+}
