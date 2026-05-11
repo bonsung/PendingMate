@@ -36,12 +36,13 @@ export default function App() {
 
   return (
     <DataProvider>
+      {/* 메인 레이아웃 - overflow-hidden 컨테이너 */}
       <div className="flex h-screen overflow-hidden bg-[#f5f6f8]">
         {/* Sidebar: desktop only */}
         <Sidebar page={page} setPage={setPage} onNewTask={openNewTask} />
 
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
+        {/* Main content: pb-[72px]로 하단 탭바에 가리지 않도록 */}
+        <main className="flex-1 overflow-y-auto pb-[72px] md:pb-0">
           {page === 'dashboard' && (
             <Dashboard onNewTask={openNewTask} onEditTask={openEditTask} setPage={setPage} />
           )}
@@ -59,40 +60,57 @@ export default function App() {
             </div>
           </div>
         )}
+      </div>
 
-        {/* Mobile Bottom Tab Bar */}
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e5e7eb]
-                        flex items-center md:hidden z-40 h-14">
-          <div className="flex items-center justify-around w-full px-1">
-            {/* 앞 2개 */}
-            {mobileNav.slice(0, 2).map(({ id, label, icon: Icon }) => (
-              <button key={id} onClick={() => setPage(id)}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-all
-                  ${page === id ? 'text-blue-600' : 'text-[#9ca3af]'}`}>
-                <Icon size={20} />
-                <span className="text-[10px] font-medium">{label}</span>
-              </button>
-            ))}
+      {/* Mobile Bottom Tab Bar
+          overflow-hidden 컨테이너 밖에 배치 → 모든 페이지에서 항상 표시 */}
+      <nav
+        className="md:hidden"
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 999,
+          backgroundColor: '#ffffff',
+          borderTop: '1px solid #e5e7eb',
+          height: '56px',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <div className="flex items-center justify-around w-full px-1">
+          {/* 앞 2개 */}
+          {mobileNav.slice(0, 2).map(({ id, label, icon: Icon }) => (
+            <button key={id} onClick={() => setPage(id)}
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-all flex-1
+                ${page === id ? 'text-blue-600' : 'text-[#9ca3af]'}`}>
+              <Icon size={20} />
+              <span className="text-[10px] font-medium">{label}</span>
+            </button>
+          ))}
 
-            {/* 중앙 + 버튼 */}
+          {/* 중앙 + 버튼 */}
+          <div className="flex flex-col items-center justify-center flex-1">
             <button onClick={openNewTask}
+              style={{ marginTop: '-20px' }}
               className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center
-                         text-white shadow-lg -mt-5 active:scale-95 transition-all flex-shrink-0">
+                         text-white shadow-lg active:scale-95 transition-all flex-shrink-0">
               <Plus size={22} />
             </button>
-
-            {/* 뒤 3개 */}
-            {mobileNav.slice(2).map(({ id, label, icon: Icon }) => (
-              <button key={id} onClick={() => setPage(id)}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-all
-                  ${page === id ? 'text-blue-600' : 'text-[#9ca3af]'}`}>
-                <Icon size={20} />
-                <span className="text-[10px] font-medium">{label}</span>
-              </button>
-            ))}
           </div>
-        </nav>
-      </div>
+
+          {/* 뒤 3개 */}
+          {mobileNav.slice(2).map(({ id, label, icon: Icon }) => (
+            <button key={id} onClick={() => setPage(id)}
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-all flex-1
+                ${page === id ? 'text-blue-600' : 'text-[#9ca3af]'}`}>
+              <Icon size={20} />
+              <span className="text-[10px] font-medium">{label}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
     </DataProvider>
   );
 }
