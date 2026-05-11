@@ -3,11 +3,11 @@ import { supabase } from './supabase.js';
 
 const DataContext = createContext(null);
 
-// snake_case → camelCase 매핑
 const mapTask = (t) => ({
   id: t.id,
   title: t.title,
   content: t.content,
+  result: t.result,
   picId: t.pic_id,
   status: t.status,
   validityDate: t.validity_date,
@@ -40,11 +40,11 @@ export function DataProvider({ children }) {
       .then(({ data }) => setPics((data || []).map(mapPic)));
   }, [tick]);
 
-  // Tasks
   const addTask = async (data) => {
     const { data: result } = await supabase.from('tasks').insert({
       title: data.title,
       content: data.content || null,
+      result: data.result || null,
       pic_id: data.picId || null,
       status: data.status,
       validity_date: data.validityDate || null,
@@ -60,6 +60,7 @@ export function DataProvider({ children }) {
     await supabase.from('tasks').update({
       title: data.title,
       content: data.content || null,
+      result: data.result || null,
       pic_id: data.picId || null,
       status: data.status,
       validity_date: data.validityDate || null,
@@ -75,7 +76,6 @@ export function DataProvider({ children }) {
     refresh();
   };
 
-  // Pics
   const addPic = async (data) => {
     await supabase.from('pics').insert({
       name: data.name,

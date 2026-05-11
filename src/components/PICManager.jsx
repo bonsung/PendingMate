@@ -5,28 +5,24 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 
 function PICForm({ pic, onSave, onCancel, addPic, updatePic }) {
   const [form, setForm] = useState({
-    name: pic?.name || '',
-    role: pic?.role || '',
+    name:  pic?.name  || '',
+    role:  pic?.role  || '',
     email: pic?.email || '',
     phone: pic?.phone || '',
-    memo: pic?.memo || '',
+    memo:  pic?.memo  || '',
   });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSave = async () => {
     if (!form.name.trim()) return alert('이름을 입력해주세요');
-    if (pic?.id) {
-      await updatePic(pic.id, form);
-    } else {
-      await addPic(form);
-    }
+    pic?.id ? await updatePic(pic.id, form) : await addPic(form);
     onSave();
   };
 
   return (
     <div className="pm-card p-4 space-y-3 fade-in">
       <h3 className="text-sm font-medium text-[#111827]">{pic ? 'PIC 수정' : '새 PIC 등록'}</h3>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="text-xs text-[#6b7280] mb-1 block">이름 *</label>
           <input value={form.name} onChange={e => set('name', e.target.value)}
@@ -62,7 +58,7 @@ function PICForm({ pic, onSave, onCancel, addPic, updatePic }) {
 }
 
 export default function PICManager() {
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm]     = useState(false);
   const [editingPic, setEditingPic] = useState(null);
   const [selectedPic, setSelectedPic] = useState(null);
 
@@ -70,9 +66,8 @@ export default function PICManager() {
 
   const handleDelete = async (id) => {
     const taskCount = tasks?.filter(t => t.picId === id).length || 0;
-    if (taskCount > 0) {
-      if (!confirm(`이 PIC에게 배정된 업무 ${taskCount}건이 있습니다. 그래도 삭제하시겠습니까?`)) return;
-    }
+    if (taskCount > 0 &&
+        !confirm(`이 PIC에게 배정된 업무 ${taskCount}건이 있습니다. 그래도 삭제하시겠습니까?`)) return;
     await deletePic(id);
     if (selectedPic?.id === id) setSelectedPic(null);
   };
@@ -82,9 +77,9 @@ export default function PICManager() {
     : [];
 
   return (
-    <div className="p-6 fade-in">
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-xl font-bold text-[#111827]">PIC 관리</h1>
+    <div className="p-4 md:p-6 fade-in">
+      <div className="flex items-center justify-between mb-4 md:mb-5">
+        <h1 className="text-lg md:text-xl font-bold text-[#111827]">PIC 관리</h1>
         <button onClick={() => { setShowForm(true); setEditingPic(null); }}
           className="pm-btn-primary flex items-center gap-2">
           <Plus size={14} />PIC 추가
@@ -93,26 +88,23 @@ export default function PICManager() {
 
       {(showForm || editingPic) && (
         <div className="mb-4">
-          <PICForm
-            pic={editingPic}
-            addPic={addPic}
-            updatePic={updatePic}
+          <PICForm pic={editingPic} addPic={addPic} updatePic={updatePic}
             onSave={() => { setShowForm(false); setEditingPic(null); }}
-            onCancel={() => { setShowForm(false); setEditingPic(null); }}
-          />
+            onCancel={() => { setShowForm(false); setEditingPic(null); }} />
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-4">
-        {/* PIC List */}
-        <div className="col-span-1 space-y-2">
+      {/* 모바일: 1열 / 데스크탑: 3열 */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* PIC 목록 */}
+        <div className="md:col-span-1 space-y-2">
           {(!pics || pics.length === 0) ? (
             <div className="pm-card p-8 text-center text-[#9ca3af] text-sm">등록된 PIC가 없습니다</div>
           ) : (
             pics.map(pic => {
               const picTaskList = tasks?.filter(t => t.picId === pic.id) || [];
-              const ongoing = picTaskList.filter(t => t.status === 'ongoing').length;
-              const clear = picTaskList.filter(t => t.status === 'clear').length;
+              const ongoing  = picTaskList.filter(t => t.status === 'ongoing').length;
+              const clear    = picTaskList.filter(t => t.status === 'clear').length;
               const clearRate = picTaskList.length > 0
                 ? Math.round(clear / picTaskList.length * 100) : 0;
               const isSelected = selectedPic?.id === pic.id;
@@ -120,20 +112,20 @@ export default function PICManager() {
               return (
                 <div key={pic.id}
                   onClick={() => setSelectedPic(isSelected ? null : pic)}
-                  className={`pm-card p-3.5 cursor-pointer transition-all group
+                  className={`pm-card p-3.5 cursor-pointer transition-all
                     ${isSelected ? 'border-blue-400 bg-blue-50' : 'hover:border-[#d1d5db]'}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center
-                                      text-blue-600 text-xs font-bold">
+                                      text-blue-600 text-xs font-bold flex-shrink-0">
                         {pic.name[0]}
                       </div>
-                      <div>
-                        <div className="text-sm font-medium text-[#111827]">{pic.name}</div>
-                        <div className="text-xs text-[#9ca3af]">{pic.role}</div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-[#111827] truncate">{pic.name}</div>
+                        <div className="text-xs text-[#9ca3af] truncate">{pic.role}</div>
                       </div>
                     </div>
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 flex-shrink-0">
                       <button onClick={e => { e.stopPropagation(); setEditingPic(pic); setShowForm(false); }}
                         className="p-1 text-[#9ca3af] hover:text-blue-600 rounded">
                         <Pencil size={12} />
@@ -161,22 +153,22 @@ export default function PICManager() {
           )}
         </div>
 
-        {/* PIC Detail */}
-        <div className="col-span-2">
+        {/* PIC 상세 */}
+        <div className="md:col-span-2">
           {!selectedPic ? (
-            <div className="pm-card p-12 text-center text-[#9ca3af]">
+            <div className="pm-card p-12 text-center text-[#9ca3af] hidden md:block">
               PIC를 선택하면 업무 내역을 확인할 수 있습니다
             </div>
           ) : (
             <div className="pm-card p-4 fade-in">
               <div className="flex items-center gap-3 mb-4 pb-4 border-b border-[#e5e7eb]">
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center
-                                text-blue-600 font-bold">
+                                text-blue-600 font-bold flex-shrink-0">
                   {selectedPic.name[0]}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="font-semibold text-[#111827]">{selectedPic.name}</div>
-                  <div className="text-xs text-[#6b7280]">
+                  <div className="text-xs text-[#6b7280] truncate">
                     {selectedPic.role} {selectedPic.email && `· ${selectedPic.email}`}
                   </div>
                   {selectedPic.memo && (
@@ -201,6 +193,9 @@ export default function PICManager() {
                         <div className="text-sm text-[#111827]">{t.title}</div>
                         {t.content && (
                           <div className="text-xs text-[#9ca3af] mt-0.5 truncate">{t.content}</div>
+                        )}
+                        {t.result && (
+                          <div className="text-xs text-emerald-700 mt-0.5 truncate">결과: {t.result}</div>
                         )}
                       </div>
                       {t.validityDate && (

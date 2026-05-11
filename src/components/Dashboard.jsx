@@ -7,12 +7,12 @@ import { CheckCircle, XCircle, Clock, PauseCircle, AlertTriangle, Plus } from 'l
 
 function StatCard({ label, value, icon: Icon, color }) {
   return (
-    <div className="pm-card p-4 flex items-center gap-4">
-      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color}`}>
-        <Icon size={18} />
+    <div className="pm-card p-4 flex items-center gap-3">
+      <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${color}`}>
+        <Icon size={17} />
       </div>
       <div>
-        <div className="text-2xl font-bold text-[#111827]">{value ?? 0}</div>
+        <div className="text-xl font-bold text-[#111827]">{value ?? 0}</div>
         <div className="text-xs text-[#6b7280]">{label}</div>
       </div>
     </div>
@@ -29,9 +29,9 @@ export default function Dashboard({ onNewTask, onEditTask, setPage }) {
 
   const stats = {
     ongoing: tasks.filter(t => t.status === 'ongoing').length,
-    clear: tasks.filter(t => t.status === 'clear').length,
-    drop: tasks.filter(t => t.status === 'drop').length,
-    hold: tasks.filter(t => t.status === 'hold').length,
+    clear:   tasks.filter(t => t.status === 'clear').length,
+    drop:    tasks.filter(t => t.status === 'drop').length,
+    hold:    tasks.filter(t => t.status === 'hold').length,
   };
 
   const urgent = tasks.filter(t => {
@@ -51,26 +51,26 @@ export default function Dashboard({ onNewTask, onEditTask, setPage }) {
     .slice(0, 5);
 
   return (
-    <div className="p-6 space-y-6 fade-in">
+    <div className="p-4 md:p-6 space-y-4 md:space-y-6 fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[#111827]">대시보드</h1>
-          <p className="text-[#6b7280] text-sm mt-0.5">
+          <h1 className="text-lg md:text-xl font-bold text-[#111827]">대시보드</h1>
+          <p className="text-[#6b7280] text-xs md:text-sm mt-0.5">
             {format(now, 'yyyy년 M월 d일 (EEE)', { locale: ko })}
           </p>
         </div>
-        <button onClick={onNewTask} className="pm-btn-primary flex items-center gap-2">
+        <button onClick={onNewTask} className="pm-btn-primary hidden md:flex items-center gap-2">
           <Plus size={14} />새 업무
         </button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-3">
-        <StatCard label="진행중" value={stats.ongoing} icon={Clock} color="bg-blue-50 text-blue-600" />
-        <StatCard label="Clear" value={stats.clear} icon={CheckCircle} color="bg-emerald-50 text-emerald-600" />
-        <StatCard label="Drop" value={stats.drop} icon={XCircle} color="bg-red-50 text-red-600" />
-        <StatCard label="보류" value={stats.hold} icon={PauseCircle} color="bg-amber-50 text-amber-600" />
+      {/* Stats: 2열(모바일) / 4열(데스크탑) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+        <StatCard label="진행중" value={stats.ongoing} icon={Clock}        color="bg-blue-50 text-blue-600" />
+        <StatCard label="Clear"  value={stats.clear}   icon={CheckCircle}  color="bg-emerald-50 text-emerald-600" />
+        <StatCard label="Drop"   value={stats.drop}    icon={XCircle}      color="bg-red-50 text-red-600" />
+        <StatCard label="보류"   value={stats.hold}    icon={PauseCircle}  color="bg-amber-50 text-amber-600" />
       </div>
 
       {/* Urgent & Overdue */}
@@ -85,12 +85,18 @@ export default function Dashboard({ onNewTask, onEditTask, setPage }) {
               <div className="space-y-2">
                 {overdue.map(t => (
                   <div key={t.id} onClick={() => onEditTask(t.id)}
-                    className="flex items-center justify-between p-2 bg-red-50 rounded-lg cursor-pointer hover:bg-red-100 transition-all">
-                    <div>
-                      <div className="text-sm text-[#111827]">{t.title}</div>
+                    className="flex items-start justify-between p-2 bg-red-50 rounded-lg
+                               cursor-pointer hover:bg-red-100 transition-all gap-2">
+                    <div className="min-w-0">
+                      <div className="text-sm text-[#111827] truncate">{t.title}</div>
                       <div className="text-xs text-[#6b7280]">PIC: {picMap[t.picId]?.name || '미지정'}</div>
+                      {t.result && (
+                        <div className="text-xs text-emerald-700 mt-0.5 truncate">결과: {t.result}</div>
+                      )}
                     </div>
-                    <div className="text-xs text-red-600">{format(new Date(t.validityDate), 'M/d HH:mm')}</div>
+                    <div className="text-xs text-red-600 flex-shrink-0">
+                      {format(new Date(t.validityDate), 'M/d HH:mm')}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -106,12 +112,16 @@ export default function Dashboard({ onNewTask, onEditTask, setPage }) {
               <div className="space-y-2">
                 {urgent.map(t => (
                   <div key={t.id} onClick={() => onEditTask(t.id)}
-                    className="flex items-center justify-between p-2 bg-amber-50 rounded-lg cursor-pointer hover:bg-amber-100 transition-all">
-                    <div>
-                      <div className="text-sm text-[#111827]">{t.title}</div>
+                    className="flex items-start justify-between p-2 bg-amber-50 rounded-lg
+                               cursor-pointer hover:bg-amber-100 transition-all gap-2">
+                    <div className="min-w-0">
+                      <div className="text-sm text-[#111827] truncate">{t.title}</div>
                       <div className="text-xs text-[#6b7280]">PIC: {picMap[t.picId]?.name || '미지정'}</div>
+                      {t.result && (
+                        <div className="text-xs text-emerald-700 mt-0.5 truncate">결과: {t.result}</div>
+                      )}
                     </div>
-                    <div className="text-xs text-amber-600">
+                    <div className="text-xs text-amber-600 flex-shrink-0">
                       {differenceInHours(new Date(t.validityDate), now)}시간 후
                     </div>
                   </div>
@@ -139,7 +149,8 @@ export default function Dashboard({ onNewTask, onEditTask, setPage }) {
               const hoursLeft = differenceInHours(new Date(t.validityDate), now);
               return (
                 <div key={t.id} onClick={() => onEditTask(t.id)}
-                  className="flex items-center gap-3 p-3 bg-[#f9fafb] rounded-lg cursor-pointer hover:bg-[#f3f4f6] transition-all group">
+                  className="flex items-start gap-3 p-3 bg-[#f9fafb] rounded-lg
+                             cursor-pointer hover:bg-[#f3f4f6] transition-all group">
                   <div className="flex-1 min-w-0">
                     <div className="text-sm text-[#111827] group-hover:text-blue-600 transition-colors truncate">
                       {t.title}
@@ -147,6 +158,9 @@ export default function Dashboard({ onNewTask, onEditTask, setPage }) {
                     <div className="text-xs text-[#6b7280] mt-0.5">
                       PIC: {pic?.name || '미지정'} · {pic?.role || ''}
                     </div>
+                    {t.result && (
+                      <div className="text-xs text-emerald-700 mt-0.5 truncate">결과: {t.result}</div>
+                    )}
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className={`text-xs ${hoursLeft <= 24 ? 'text-amber-600' : 'text-[#6b7280]'}`}>
@@ -170,7 +184,7 @@ export default function Dashboard({ onNewTask, onEditTask, setPage }) {
           {pics.map(pic => {
             const picTasks = tasks.filter(t => t.picId === pic.id);
             const ongoingTasks = picTasks.filter(t => t.status === 'ongoing');
-            const clearTasks = picTasks.filter(t => t.status === 'clear');
+            const clearTasks  = picTasks.filter(t => t.status === 'clear');
             const total = picTasks.length;
             const clearRate = total > 0 ? Math.round((clearTasks.length / total) * 100) : 0;
             return (
@@ -181,15 +195,15 @@ export default function Dashboard({ onNewTask, onEditTask, setPage }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-[#111827]">{pic.name}</span>
-                    <span className="text-xs text-[#6b7280]">진행중 {ongoingTasks.length}건</span>
+                    <span className="text-sm text-[#111827] truncate">{pic.name}</span>
+                    <span className="text-xs text-[#6b7280] ml-2 flex-shrink-0">진행중 {ongoingTasks.length}건</span>
                   </div>
                   <div className="h-1.5 bg-[#e5e7eb] rounded-full overflow-hidden">
                     <div className="h-full bg-emerald-500 rounded-full transition-all"
                       style={{ width: `${clearRate}%` }} />
                   </div>
                 </div>
-                <span className="text-xs text-[#6b7280] w-10 text-right">{clearRate}%</span>
+                <span className="text-xs text-[#6b7280] w-10 text-right flex-shrink-0">{clearRate}%</span>
               </div>
             );
           })}

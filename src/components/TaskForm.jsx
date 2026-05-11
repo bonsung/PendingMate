@@ -7,15 +7,15 @@ import { format } from 'date-fns';
 
 const STATUS_OPTIONS = [
   { value: STATUS.ONGOING, label: '진행중', cls: 'status-ongoing' },
-  { value: STATUS.CLEAR, label: 'Clear ✓', cls: 'status-clear' },
-  { value: STATUS.DROP, label: 'Drop ✗', cls: 'status-drop' },
-  { value: STATUS.HOLD, label: '보류', cls: 'status-hold' },
+  { value: STATUS.CLEAR,   label: 'Clear ✓', cls: 'status-clear' },
+  { value: STATUS.DROP,    label: 'Drop ✗',  cls: 'status-drop' },
+  { value: STATUS.HOLD,    label: '보류',    cls: 'status-hold' },
 ];
 
 const PRIORITY_OPTIONS = [
-  { value: 'high', label: '🔴 높음' },
+  { value: 'high',   label: '🔴 높음' },
   { value: 'normal', label: '🟡 보통' },
-  { value: 'low', label: '🟢 낮음' },
+  { value: 'low',    label: '🟢 낮음' },
 ];
 
 export default function TaskForm({ taskId, onClose }) {
@@ -23,13 +23,11 @@ export default function TaskForm({ taskId, onClose }) {
   const { pics, refresh } = useData();
 
   const [form, setForm] = useState({
-    title: '', content: '', picId: '',
+    title: '', content: '', result: '', picId: '',
     status: STATUS.ONGOING,
     validityDay: '', validityTime: '',
     priority: 'normal',
   });
-
-  // 저장된 첨부(수정 모드) / 임시 첨부(신규 모드)
   const [savedAttachments, setSavedAttachments] = useState([]);
   const [pendingAttachments, setPendingAttachments] = useState([]);
   const [linkInput, setLinkInput] = useState('');
@@ -38,7 +36,6 @@ export default function TaskForm({ taskId, onClose }) {
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef();
 
-  // 수정 모드: 기존 데이터 로드
   useEffect(() => {
     if (!taskId) return;
     supabase.from('tasks').select('*').eq('id', taskId).single()
@@ -46,16 +43,16 @@ export default function TaskForm({ taskId, onClose }) {
         if (!task) return;
         const d = task.validity_date ? new Date(task.validity_date) : null;
         setForm({
-          title: task.title || '',
-          content: task.content || '',
-          picId: task.pic_id || '',
-          status: task.status || STATUS.ONGOING,
-          validityDay: d ? format(d, 'yyyy-MM-dd') : '',
+          title:       task.title || '',
+          content:     task.content || '',
+          result:      task.result || '',
+          picId:       task.pic_id || '',
+          status:      task.status || STATUS.ONGOING,
+          validityDay:  d ? format(d, 'yyyy-MM-dd') : '',
           validityTime: d ? format(d, 'HH:mm') : '',
-          priority: task.priority || 'normal',
+          priority:    task.priority || 'normal',
         });
       });
-
     supabase.from('attachments').select('*').eq('task_id', taskId)
       .then(({ data }) => setSavedAttachments(data || []));
   }, [taskId]);
@@ -114,15 +111,16 @@ export default function TaskForm({ taskId, onClose }) {
     setSaving(true);
     const now = new Date().toISOString();
     const taskData = {
-      title: form.title,
-      content: form.content || null,
-      pic_id: form.picId ? Number(form.picId) : null,
-      status: form.status,
+      title:        form.title,
+      content:      form.content || null,
+      result:       form.result || null,
+      pic_id:       form.picId ? Number(form.picId) : null,
+      status:       form.status,
       validity_date: form.validityDay
         ? new Date(`${form.validityDay}T${form.validityTime || '00:00'}`).toISOString()
         : null,
-      priority: form.priority,
-      updated_at: now,
+      priority:     form.priority,
+      updated_at:   now,
     };
 
     if (isEdit) {
@@ -138,7 +136,6 @@ export default function TaskForm({ taskId, onClose }) {
         );
       }
     }
-
     refresh();
     setSaving(false);
     onClose();
@@ -169,11 +166,19 @@ export default function TaskForm({ taskId, onClose }) {
           <label className="block text-xs font-medium text-[#6b7280] mb-1.5">업무 내용</label>
           <textarea value={form.content} onChange={e => set('content', e.target.value)}
             placeholder="업무 내용, 지시사항, 참고사항을 입력하세요"
-            rows={4} className="pm-input resize-none" />
+            rows={3} className="pm-input resize-none" />
+        </div>
+
+        {/* Result */}
+        <div>
+          <label className="block text-xs font-medium text-[#6b7280] mb-1.5">업무결과</label>
+          <textarea value={form.result} onChange={e => set('result', e.target.value)}
+            placeholder="결과 내용, 코멘트, 특이사항을 입력하세요"
+            rows={3} className="pm-input resize-none" />
         </div>
 
         {/* PIC + Priority */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-[#6b7280] mb-1.5">PIC (담당자)</label>
             <select value={form.picId} onChange={e => set('picId', e.target.value)} className="pm-input">
@@ -194,7 +199,7 @@ export default function TaskForm({ taskId, onClose }) {
         </div>
 
         {/* Validity + Status */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-[#6b7280] mb-1.5">Validity (마감일시)</label>
             <div className="flex gap-2">
@@ -226,9 +231,9 @@ export default function TaskForm({ taskId, onClose }) {
             <div className="space-y-1.5 mb-2">
               {displayAttachments.map(a => (
                 <div key={a.id || a._tempId}
-                  className="flex items-center gap-2 p-2 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg text-sm">
+                  className="flex items-center gap-2 p-2 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg">
                   {a.type === 'image' ? <Image size={14} className="text-blue-500" /> :
-                   a.type === 'link' ? <Link size={14} className="text-emerald-500" /> :
+                   a.type === 'link'  ? <Link  size={14} className="text-emerald-500" /> :
                    <Paperclip size={14} className="text-[#6b7280]" />}
                   <span className="flex-1 text-[#6b7280] truncate text-xs">{a.name}</span>
                   {(a.type === 'link' || a.type === 'image') && (

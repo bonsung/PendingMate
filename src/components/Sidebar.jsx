@@ -4,10 +4,10 @@ import { useData } from '../DataContext.jsx';
 
 const nav = [
   { id: 'dashboard', label: '대시보드', icon: LayoutDashboard },
-  { id: 'tasks', label: '업무 목록', icon: ListTodo },
-  { id: 'pics', label: 'PIC 관리', icon: Users },
-  { id: 'reports', label: '보고서', icon: BarChart3 },
-  { id: 'settings', label: '설정', icon: Settings },
+  { id: 'tasks',     label: '업무 목록', icon: ListTodo },
+  { id: 'pics',      label: 'PIC 관리',  icon: Users },
+  { id: 'reports',   label: '보고서',    icon: BarChart3 },
+  { id: 'settings',  label: '설정',      icon: Settings },
 ];
 
 export default function Sidebar({ page, setPage, onNewTask }) {
@@ -31,7 +31,8 @@ export default function Sidebar({ page, setPage, onNewTask }) {
   );
 
   return (
-    <aside className="w-56 flex-shrink-0 bg-white border-r border-[#e5e7eb] flex flex-col h-full">
+    /* 데스크탑에서만 표시 */
+    <aside className="hidden md:flex w-56 flex-shrink-0 bg-white border-r border-[#e5e7eb] flex-col h-full">
       {/* Logo */}
       <div className="px-4 py-5 border-b border-[#e5e7eb]">
         <div className="flex items-center gap-2">
@@ -47,12 +48,10 @@ export default function Sidebar({ page, setPage, onNewTask }) {
 
       {/* New Task Button */}
       <div className="px-3 pt-4 pb-2">
-        <button
-          onClick={onNewTask}
+        <button onClick={onNewTask}
           className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-500
                      text-white px-3 py-2.5 rounded-lg text-sm font-medium
-                     transition-all active:scale-95"
-        >
+                     transition-all active:scale-95">
           <Plus size={15} />
           <span>새 업무 등록</span>
         </button>
@@ -61,16 +60,12 @@ export default function Sidebar({ page, setPage, onNewTask }) {
       {/* Navigation */}
       <nav className="flex-1 px-2 py-2 space-y-0.5">
         {nav.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setPage(id)}
+          <button key={id} onClick={() => setPage(id)}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
                         text-sm transition-all text-left relative
                         ${page === id
                           ? 'bg-blue-50 text-blue-600'
-                          : 'text-[#6b7280] hover:bg-gray-50 hover:text-[#111827]'
-                        }`}
-          >
+                          : 'text-[#6b7280] hover:bg-gray-50 hover:text-[#111827]'}`}>
             <Icon size={16} />
             <span>{label}</span>
             {id === 'tasks' && ongoingCount > 0 && (
